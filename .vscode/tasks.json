@@ -15,6 +15,13 @@
 			"command": "make",
 			"args": [ "PROGRAM_ARGS=--debug --color" ],
 			"group": {"kind":"test", "isDefault":true}
+		},
+		{
+			"label": "Build",
+			"type": "shell",
+			"command": "make",
+			"args": [ "build" ],
+			"group": {"kind":"build", "isDefault":true}
 		}
 	]
 }
