@@ -1,6 +1,6 @@
 require 'path'
 require 'libraries'
-log.debug('loading properties')
+
 properties = json.decode(love.filesystem.read('properties.json'))
 epsilon = assert(properties.epsilon)
 require 'cli'
