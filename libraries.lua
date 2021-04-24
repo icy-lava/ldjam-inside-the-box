@@ -8,5 +8,3 @@ inspect = require 'inspect'
 json = require 'json'
 bump = require 'bump'
 roomy = require 'roomy'
-
-palette = require 'palette' -- TODO: handle palettes
