@@ -38,18 +38,34 @@ function game:enter()
 				input = true,
 				move = vector(),
 				speed = properties.player.speed,
-				draw = require 'draw.player'
+				draw = require 'draw.player',
+				z = 1
 			}
 			self.tiny:addEntity(player)
 			self.bump:add(player, tileToRect(x, y))
 		elseif type:match('^redirect_') then
 			local redirect = {
 				redirector = true,
-				direction = type:match('_([^_]+)$')
+				direction = type:match('_([^_]+)$'),
+				draw = require 'draw.redirect'
 			}
 			assert(redirect.direction)
 			self.tiny:addEntity(redirect)
 			self.bump:add(redirect, tileToRect(x, y))
+		elseif type == 'stop' then
+			local stop = {
+				stop = true,
+				draw = require 'draw.stop'
+			}
+			self.tiny:addEntity(stop)
+			self.bump:add(stop, tileToRect(x, y))
+		elseif type == 'block' then
+			local block = {
+				block = true,
+				draw = require 'draw.block'
+			}
+			self.tiny:addEntity(block)
+			self.bump:add(block, tileToRect(x, y))
 		end
 	end
 	self.player = assert(player)

@@ -23,7 +23,7 @@
 		"speed": 500
 	},
 	"epsilon": 0.001,
-	"tiles": ["player", null, null, null, "redirect_right", "redirect_up", "redirect_left", "redirect_down"],
+	"tiles": ["player", "checkpoint", "stop", "block", "redirect_right", "redirect_up", "redirect_left", "redirect_down"],
 	"direction_mapping": {
 		"right": [ 1,  0],
 		"up":    [ 0, -1],

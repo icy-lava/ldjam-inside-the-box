@@ -55,6 +55,8 @@ return function()
 		if other then
 			if other.redirector then
 				e.redirect = vector(unpack(properties.direction_mapping[other.direction], 1, 2))
+			elseif other.block then
+				nx, ny = nx - mx, ny - my
 			end
 		end
 		
