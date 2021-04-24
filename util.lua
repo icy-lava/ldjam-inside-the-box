@@ -34,6 +34,10 @@ function util.tileToRect(x, y)
 	return x * tw + epsilon, y * th + epsilon, tw - epsilon - 2, th - epsilon * 2
 end
 
+function util.snapRectToTile(x, y, w, h)
+	return tileToRect(rectToTile(x, y, w or (util.getState().level.tilewidth - epsilon * 2), h or (util.getState().level.tileheight - epsilon * 2)))
+end
+
 function util.export()
 	for k, v in pairs(util) do
 		_G[k] = v

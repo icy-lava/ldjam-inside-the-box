@@ -1,5 +1,4 @@
 local targetSystem = tiny.processingSystem()
--- targetSystem.filter = tiny.requireAll('bump', 'move', tiny.rejectAll('tween'))
 targetSystem.filter = tiny.requireAll(isPhysical, hasInput, tiny.rejectAll('tween'))
 
 function targetSystem:process(e, dt)

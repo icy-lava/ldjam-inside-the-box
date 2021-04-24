@@ -22,7 +22,7 @@ function game:enter()
 			assert(not player)
 			player = {input = true, move = vector(), speed = properties.player.speed}
 			self.tiny:addEntity(player)
-			self.bump:add(player, tileToRect(rectToTile(object.x, object.y, object.width, object.height))) -- make sure object is aligned
+			self.bump:add(player, snapRectToTile(object.x, object.y, object.width, object.height))
 		end
 	end
 	self.player = assert(player)
