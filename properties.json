@@ -4,19 +4,30 @@
 	"window": {
 		"virtual_size": "720:720"
 	},
-	"palette": {
-		"accent": "ffffff"
+	"color": {
+		"player": "9A031E",
+		"level_end": "87A0B2",
+		"background": "321325"
+	},
+	"font": {
+		"main": "asset/font/nunito/Nunito-Regular.ttf"
 	},
 	"keyboard": {
 		"left": ["left", "a"],
 		"right": ["right", "d"],
 		"up": ["up", "w"],
 		"down":  ["down", "s"],
-		"jump": ["space", "x", "j"],
-		"action": ["return", "c", "k", "e"]
+		"action": ["space", "x", "j"]
 	},
 	"player": {
 		"speed": 500
 	},
-	"epsilon": 0.001
+	"epsilon": 0.001,
+	"tiles": ["player", null, null, null, "redirect_right", "redirect_up", "redirect_left", "redirect_down"],
+	"direction_mapping": {
+		"right": [ 1,  0],
+		"up":    [ 0, -1],
+		"left":  [-1,  0],
+		"down":  [ 0,  1]
+	}
 }

@@ -53,8 +53,8 @@ return function()
 		end
 		
 		if other then
-			if other.block then
-				nx, ny = nx - mx, ny - my
+			if other.redirector then
+				e.redirect = vector(unpack(properties.direction_mapping[other.direction], 1, 2))
 			end
 		end
 		
@@ -71,6 +71,9 @@ return function()
 			:oncomplete(function()
 				if other and other.level then
 					scene.newLevel = other.level
+				end
+				if not other then
+					scene.newLevel = "pop"
 				end
 				e.tween = nil
 				scene.tiny:addEntity(e)

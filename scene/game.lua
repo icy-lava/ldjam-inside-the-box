@@ -2,9 +2,8 @@ local game = {}
 
 function game:enter()
 	log.trace 'entered scene.game'
-	
 	self.tween = flux.group()
-	self.level = json.decode(assert(love.filesystem.read(('asset/map_export/%d.json'):format(level))))
+	self.level = json.decode(assert(love.filesystem.read(('asset/map_export/%d.json'):format(levelStack[#levelStack]))))
 	
 	self.bump = bump.newWorld(200)
 	self.tiny = tiny.world()
@@ -17,20 +16,40 @@ function game:enter()
 		self.tiny:addSystem(require(s)())
 	end
 	
-	local player
 	for _, object in ipairs(lume.match(self.level.layers, function(l) return l.name == 'Objects' end).objects) do
-		if object.type == 'player' then
-			assert(not player)
-			player = {input = true, move = vector(), speed = properties.player.speed}
-			self.tiny:addEntity(player)
-			self.bump:add(player, snapRectToTile(object.x, object.y, object.width, object.height))
-		elseif object.type:match('^level%d+$') then
-			local tile = {level = tonumber((object.type:match('^level(%d+)$')))}
+		if object.name:match('^level%d+$') then
+			local tile = {
+				level = tonumber((object.name:match('^level(%d+)$'))),
+				draw = require 'draw.level_end'
+			}
 			assert(tile.level)
 			self.tiny:addEntity(tile)
 			self.bump:add(tile, snapRectToTile(object.x, object.y, object.width, object.height))
-		else
-			error('unknown level object type: ' .. object.type)
+		end
+	end
+	
+	local player
+	for i, id in ipairs(lume.match(self.level.layers, function(l) return l.name == 'Tiles' end).data) do
+		local type = properties.tiles[id] or 'undefined'
+		local x, y = (i - 1) % self.level.width, math.floor((i - 1) / self.level.width)
+		if type == 'player' then
+			assert(not player, 'only one player per level allowed')
+			player = {
+				input = true,
+				move = vector(),
+				speed = properties.player.speed,
+				draw = require 'draw.player'
+			}
+			self.tiny:addEntity(player)
+			self.bump:add(player, tileToRect(x, y))
+		elseif type:match('^redirect_') then
+			local redirect = {
+				redirector = true,
+				direction = type:match('_([^_]+)$')
+			}
+			assert(redirect.direction)
+			self.tiny:addEntity(redirect)
+			self.bump:add(redirect, tileToRect(x, y))
 		end
 	end
 	self.player = assert(player)
@@ -42,9 +61,21 @@ function game:update(dt)
 	self.tween:update(love.timer.getDelta())
 	self.tiny:update(love.timer.getDelta(), function(_, s) return not s.draw end)
 	if self.newLevel then
-		switchLevel(self.newLevel)
+		if self.newLevel == 'pop' then
+			popLevel()
+		else
+			pushLevel(self.newLevel)
+		end
 		self.newLevel = nil
+		return
 	end
+	local ww, wh = love.graphics.getDimensions()
+	local vw, vh = unpack(properties.window.virtual_size, 1, 2)
+	self.camera:zoomTo(math.min(
+		ww / vw * vw / self.level.tilewidth / self.level.width,
+		wh / vh * vh / self.level.tileheight / self.level.height
+	))
+	self.camera:lookAt(self.level.tilewidth * (self.level.width / 2), self.level.tileheight * (self.level.height / 2))
 end
 
 local function drawHUD(self)
@@ -55,29 +86,15 @@ local function drawHUD(self)
 end
 
 local function drawGame(self)
-	local ww, wh = love.graphics.getDimensions()
-	local vw, vh = unpack(properties.window.virtual_size, 1, 2)
-	love.graphics.push()
-	love.graphics.scale(math.min(
-		ww / vw * vw / self.level.tilewidth / self.level.width,
-		wh / vh * vh / self.level.tileheight / self.level.height
-	))
-	love.graphics.translate(
-		-self.level.tilewidth * (self.level.width / 2),
-		-self.level.tileheight * (self.level.height / 2)
-	)
 	self.tiny:update(love.timer.getDelta(), function(_, s) return s.draw end)
-	love.graphics.pop()
 end
 
 function game:draw()
 	local ww, wh = love.graphics.getDimensions()
-	
-	love.graphics.push()
+	love.graphics.clear(properties.color.background)
 	self.camera:attach()
 	drawGame(self)
 	self.camera:detach()
-	love.graphics.pop()
 	drawHUD(self, ww, wh)
 end
 

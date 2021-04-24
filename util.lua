@@ -38,9 +38,44 @@ function util.snapRectToTile(x, y, w, h)
 	return tileToRect(rectToTile(x, y, w or (util.getScene().level.tilewidth - epsilon * 2), h or (util.getScene().level.tileheight - epsilon * 2)))
 end
 
-function util.switchLevel(l)
-	level = l
+function util.pushLevel(l)
+	levelStack[#levelStack + 1] = l
 	manager:enter(require 'scene.game')
+end
+
+function util.popLevel()
+	levelStack[#levelStack] = nil
+	manager:enter(require 'scene.game')
+end
+
+local _map = {[0] = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'b', 'c', 'd', 'e', 'f'}
+local map = {}
+for i = 0, 15 do
+	map[tostring(_map[i])] = i
+end
+function util.codeToColor(colorCode)
+	colorCode = colorCode:lower():gsub('^#', '')
+	local color = {}
+	local parsed = false
+	for value in colorCode:gmatch('%w%w') do
+		table.insert(color, (map[value:sub(1, 1)] * 16 + map[value:sub(2, 2)]) / 255)
+		parsed = true
+	end
+	if not parsed then return nil, 'could not parse color code' end
+	color[4] = color[4] or 1
+	return color
+end
+
+local maxFonts = 10
+local fonts = {}
+function util.getFont(path, size)
+	size = math.floor(size + 0.5)
+	for i = 1, #fonts do
+		if fonts[i][1] == path and fonts[i][2] == size then return fonts[i][3] end
+	end
+	table.insert(fonts, 1, {path, size, love.graphics.newFont(path, size)})
+	while fonts[maxFonts + 1] do table.remove(fonts, maxFonts + 1) end
+	return fonts[#fonts][3]
 end
 
 function util.export()

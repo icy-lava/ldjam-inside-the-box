@@ -16,7 +16,7 @@ globals = {
 	'properties',
 	'manager',
 	'epsilon',
-	'level',
+	'levelStack',
 }
 
 for k in pairs(require 'util') do
