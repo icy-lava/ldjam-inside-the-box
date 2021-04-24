@@ -1,0 +1,24 @@
+{
+	"title": "LD48",
+	"identity": "icylavah_ld48",
+	"window": {
+		"virtual_size": "720:720"
+	},
+	"palette": {
+		"accent": "ffffff"
+	},
+	"keyboard": {
+		"left": ["left", "a"],
+		"right": ["right", "d"],
+		"up": ["up", "w"],
+		"down":  ["down", "s"],
+		"jump": ["space", "x", "j"],
+		"action": ["return", "c", "k", "e"]
+	},
+	"player": {
+		"speed": 500
+	},
+	"tile_width":  64,
+	"tile_height": 64,
+	"epsilon": 0.001
+}

@@ -1,0 +1,1 @@
+@"C:\Program Files\LOVE\lovec.exe" "%~dp0/" %*
