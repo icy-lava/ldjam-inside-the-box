@@ -4,10 +4,7 @@ function game:enter()
 	log.trace 'entered scene.game'
 	
 	self.tween = flux.group()
-	self.level = {
-		start = vector(-2, -2),
-		stop  = vector(2, 2),
-	}
+	self.level = json.decode(assert(love.filesystem.read(('asset/map_export/%s.json'):format(level))))
 	
 	self.bump = bump.newWorld(200)
 	self.tiny = tiny.world()
@@ -19,24 +16,16 @@ function game:enter()
 		self.tiny:addSystem(require(s))
 	end
 	
-	local player = {
-		input = true,
-		move = vector(),
-		speed = properties.player.speed
-	}
-	self.tiny:addEntity(player)
-	self.bump:add(
-		player,
-		0 * properties.tile_width, 0 * properties.tile_height,
-		properties.tile_width - epsilon, properties.tile_height - epsilon
-	)
-	local e = {}
-	self.tiny:addEntity(e)
-	self.bump:add(
-		e,
-		-1 * properties.tile_width, 0 * properties.tile_height,
-		properties.tile_width - epsilon, properties.tile_height - epsilon
-	)
+	local player
+	for _, object in ipairs(lume.match(self.level.layers, function(l) return l.name == 'Objects' end).objects) do
+		if object.type == 'player' then
+			assert(not player)
+			player = {input = true, move = vector(), speed = properties.player.speed}
+			self.tiny:addEntity(player)
+			self.bump:add(player, object.x, object.y, object.width, object.height)
+		end
+	end
+	self.player = assert(player)
 	
 	self.camera = require 'hump.camera' (0, 0)
 end
@@ -58,12 +47,12 @@ local function drawGame(self)
 	local vw, vh = unpack(properties.window.virtual_size, 1, 2)
 	love.graphics.push()
 	love.graphics.scale(math.min(
-		ww / vw * vw / properties.tile_width / (self.level.stop.x - self.level.start.x + 1),
-		wh / vh * vh / properties.tile_height / (self.level.stop.y - self.level.start.y + 1)
+		ww / vw * vw / self.level.tilewidth / self.level.width,
+		wh / vh * vh / self.level.tileheight / self.level.height
 	))
 	love.graphics.translate(
-		-properties.tile_width * ((self.level.start.x + self.level.stop.x) / 2 + 0.5),
-		-properties.tile_height * ((self.level.start.y + self.level.stop.y) / 2 + 0.5)
+		-self.level.tilewidth * (self.level.width / 2),
+		-self.level.tileheight * (self.level.height / 2)
 	)
 	self.tiny:update(love.timer.getDelta(), function(_, s) return s == require 'system.draw' end)
 	love.graphics.pop()

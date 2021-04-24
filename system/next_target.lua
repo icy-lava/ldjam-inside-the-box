@@ -11,7 +11,7 @@ function targetSystem:process(e, dt)
 		mx = lume.sign(mx)
 	end
 	local position = {x, y}
-	e.tween = scene.tween:to(position, 0.2, {x + properties.tile_width * mx, y + properties.tile_width * my})
+	e.tween = scene.tween:to(position, 0.2, {x + scene.level.tilewidth * mx, y + scene.level.tileheight * my})
 	:onupdate(function()
 		scene.bump:move(e, position[1], position[2])
 	end)

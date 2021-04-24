@@ -18,7 +18,5 @@
 	"player": {
 		"speed": 500
 	},
-	"tile_width":  64,
-	"tile_height": 64,
 	"epsilon": 0.001
 }

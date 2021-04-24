@@ -14,6 +14,26 @@ function util.hasInput(s, e)
 	return e.move and (e.move.x ~= 0 or e.move.y ~= 0)
 end
 
+function util.positionToTile(x, y)
+	local scene = util.getScene()
+	return x / scene.level.tilewidth, y / scene.level.tileheight
+end
+
+function util.rectToTile(x, y, w, h)
+	return util.worldToTile(x + w / 2, y + h / 2)
+end
+
+function util.tileToPosition(x, y)
+	local scene = util.getScene()
+	return x * scene.level.tilewidth, y * scene.level.tileheight
+end
+
+function util.tileToRect(x, y)
+	local scene = util.getScene()
+	local tw, th = scene.level.tilewidth, scene.level.tileheight
+	return x * tw + epsilon, y * th + epsilon, tw - epsilon - 2, th - epsilon * 2
+end
+
 function util.export()
 	for k, v in pairs(util) do
 		_G[k] = v

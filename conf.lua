@@ -13,6 +13,7 @@ if cli.show_console or cli.debug then require 'alloc_console' () end
 
 log.trace 'patching in util.lua'
 require 'util'.export()
+level = 0
 
 log.debug('starting in ', cli.debug and 'debug mode' or 'release mode')
 
