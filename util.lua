@@ -35,7 +35,7 @@ function util.tileToRect(x, y)
 end
 
 function util.snapRectToTile(x, y, w, h)
-	return tileToRect(rectToTile(x, y, w or (util.getState().level.tilewidth - epsilon * 2), h or (util.getState().level.tileheight - epsilon * 2)))
+	return tileToRect(rectToTile(x, y, w or (util.getScene().level.tilewidth - epsilon * 2), h or (util.getScene().level.tileheight - epsilon * 2)))
 end
 
 function util.export()
