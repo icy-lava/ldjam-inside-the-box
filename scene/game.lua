@@ -4,7 +4,7 @@ function game:enter()
 	log.trace 'entered scene.game'
 	
 	self.tween = flux.group()
-	self.level = json.decode(assert(love.filesystem.read(('asset/map_export/%s.json'):format(level))))
+	self.level = json.decode(assert(love.filesystem.read(('asset/map_export/%d.json'):format(level))))
 	
 	self.bump = bump.newWorld(200)
 	self.tiny = tiny.world()
@@ -14,7 +14,7 @@ function game:enter()
 		'system.next_target',
 		'system.draw',
 	} do
-		self.tiny:addSystem(require(s))
+		self.tiny:addSystem(require(s)())
 	end
 	
 	local player
@@ -40,13 +40,17 @@ end
 
 function game:update(dt)
 	self.tween:update(love.timer.getDelta())
-	self.tiny:update(love.timer.getDelta(), function(_, s) return s ~= require 'system.draw' end)
+	self.tiny:update(love.timer.getDelta(), function(_, s) return not s.draw end)
+	if self.newLevel then
+		switchLevel(self.newLevel)
+		self.newLevel = nil
+	end
 end
 
 local function drawHUD(self)
 	if cli.debug then
 		love.graphics.setColor(1, 1, 1, 1)
-		love.graphics.print(string.format('%0.1fms', love.timer.getAverageDelta() * 1000), 4, 4)
+		love.graphics.print(string.format('%0.1fms, %d entities, %d systems', love.timer.getAverageDelta() * 1000, self.tiny:getEntityCount(), self.tiny:getSystemCount()), 4, 4)
 	end
 end
 
@@ -62,7 +66,7 @@ local function drawGame(self)
 		-self.level.tilewidth * (self.level.width / 2),
 		-self.level.tileheight * (self.level.height / 2)
 	)
-	self.tiny:update(love.timer.getDelta(), function(_, s) return s == require 'system.draw' end)
+	self.tiny:update(love.timer.getDelta(), function(_, s) return s.draw end)
 	love.graphics.pop()
 end
 

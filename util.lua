@@ -38,6 +38,11 @@ function util.snapRectToTile(x, y, w, h)
 	return tileToRect(rectToTile(x, y, w or (util.getScene().level.tilewidth - epsilon * 2), h or (util.getScene().level.tileheight - epsilon * 2)))
 end
 
+function util.switchLevel(l)
+	level = l
+	manager:enter(require 'scene.game')
+end
+
 function util.export()
 	for k, v in pairs(util) do
 		_G[k] = v
