@@ -16,11 +16,11 @@ end
 
 function util.positionToTile(x, y)
 	local scene = util.getScene()
-	return x / scene.level.tilewidth, y / scene.level.tileheight
+	return math.floor(x / scene.level.tilewidth), math.floor(y / scene.level.tileheight)
 end
 
 function util.rectToTile(x, y, w, h)
-	return util.worldToTile(x + w / 2, y + h / 2)
+	return util.positionToTile(x + w / 2, y + h / 2)
 end
 
 function util.tileToPosition(x, y)
