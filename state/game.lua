@@ -14,8 +14,6 @@ function game:enter()
 	for _, s in ipairs {
 		'system.input_player',
 		'system.next_target',
-		-- 'system.acceleration',
-		-- 'system.velocity',
 		'system.draw',
 	} do
 		self.tiny:addSystem(require(s))
@@ -24,8 +22,7 @@ function game:enter()
 	local player = {
 		input = true,
 		move = vector(),
-		speed = properties.player.speed,
-		velocity = vector()
+		speed = properties.player.speed
 	}
 	self.tiny:addEntity(player)
 	self.bump:add(
@@ -33,18 +30,13 @@ function game:enter()
 		0 * properties.tile_width, 0 * properties.tile_height,
 		properties.tile_width - epsilon, properties.tile_height - epsilon
 	)
-	local e = {bump = self.bump}
+	local e = {}
 	self.tiny:addEntity(e)
 	self.bump:add(
 		e,
 		-1 * properties.tile_width, 0 * properties.tile_height,
 		properties.tile_width - epsilon, properties.tile_height - epsilon
 	)
-	-- local block = {
-	-- 	bump = self.bump
-	-- }
-	-- self.tiny:addEntity(block)
-	-- self.bump:add(block, 128, 128, 32, 32)
 	
 	self.camera = require 'hump.camera' (0, 0)
 end
@@ -69,8 +61,6 @@ local function drawGame(self)
 		ww / vw * vw / properties.tile_width / (self.level.stop.x - self.level.start.x + 1),
 		wh / vh * vh / properties.tile_height / (self.level.stop.y - self.level.start.y + 1)
 	))
-	-- self.level.start.x + self.level.stop.x
-	local tx = (self.level.start.x + self.level.stop.x) / 2--math.floor(love.mouse.getX() / 50 - 5)
 	love.graphics.translate(
 		-properties.tile_width * ((self.level.start.x + self.level.stop.x) / 2 + 0.5),
 		-properties.tile_height * ((self.level.start.y + self.level.stop.y) / 2 + 0.5)
