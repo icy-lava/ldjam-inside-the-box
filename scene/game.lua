@@ -23,6 +23,13 @@ function game:enter()
 			player = {input = true, move = vector(), speed = properties.player.speed}
 			self.tiny:addEntity(player)
 			self.bump:add(player, snapRectToTile(object.x, object.y, object.width, object.height))
+		elseif object.type:match('^level%d+$') then
+			local tile = {level = tonumber((object.type:match('^level(%d+)$')))}
+			assert(tile.level)
+			self.tiny:addEntity(tile)
+			self.bump:add(tile, snapRectToTile(object.x, object.y, object.width, object.height))
+		else
+			error('unknown level object type: ' .. object.type)
 		end
 	end
 	self.player = assert(player)
