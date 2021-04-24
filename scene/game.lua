@@ -9,6 +9,7 @@ function game:enter()
 	self.bump = bump.newWorld(200)
 	self.tiny = tiny.world()
 	for _, s in ipairs {
+		'system.physical',
 		'system.input_player',
 		'system.next_target',
 		'system.draw',
