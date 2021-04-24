@@ -31,7 +31,7 @@ end
 function util.tileToRect(x, y)
 	local scene = util.getScene()
 	local tw, th = scene.level.tilewidth, scene.level.tileheight
-	return x * tw + epsilon, y * th + epsilon, tw - epsilon - 2, th - epsilon * 2
+	return x * tw + epsilon, y * th + epsilon, tw - epsilon * 2, th - epsilon * 2
 end
 
 function util.snapRectToTile(x, y, w, h)
