@@ -1,24 +1,43 @@
 return function (e)
-	local scale = getScene().camera.scale
-	love.graphics.setColor(properties.color.level_end)
-	local x, y, w, h = getScene().bump:getRect(e)
-	love.graphics.rectangle('fill', x, y, w, h, 4, nil, 100)
-	love.graphics.setColor(properties.color.player)
+	local scene = getEntityScene(e)
+	local t = getLevelTween(scene)
+	
+	local x, y, w, h = scene.bump:getRect(e)
+	local color = properties.color.level_end
+	love.graphics.setColor(color[1], color[2], color[3], 1 - t)
+	love.graphics.rectangle('fill', x, y, w, h, 4 * (1 - t), nil, 100)
+	
 	local prevFont = love.graphics.getFont()
-	local font = getFont(properties.font.main, 36 * scale)
+	
+	local scale
+	if getLevelTween(scene) > 0 then
+		scale = getLevelZoom(scene, 1, 1)
+	elseif getExitTween(scene) > 0 then
+		scale = getLevelZoom(scene, 2, 2)
+	else
+		scale = getLevelZoom(scene)
+	end
+	
+	scale = scale / getTransitionMultiplier(scene)
+	
+	local fontSize = math.floor(properties.font.size * scale + 0.5)
+	local font = getFont(properties.font.main, fontSize)
 	love.graphics.setFont(font)
 	
-	local text = '#' .. e.level
+	local text = getLevelLabel(e.level)
 	local tw, th = font:getWidth(text), font:getHeight()
 	
 	love.graphics.push()
-	local tx, ty = math.floor((x + w / 2) * scale - tw / 2), math.floor((y + h / 2) * scale - th / 2)
-	love.graphics.translate(tx / scale, ty / scale)
+	love.graphics.translate(math.floor((x + w / 2) * scale + 0.5) / scale, math.floor((y + h / 2) * scale + 0.5) / scale)
 	love.graphics.scale(1 / scale)
+	love.graphics.translate(-tw / 2, -th / 2)
+	
+	local color2 = properties.color.level_label
+	love.graphics.setColor(color2[1], color2[2], color2[3], 1 - t * t * t)
 	love.graphics.print(text)
+	
 	love.graphics.pop()
-	love.graphics.setColor(1, 1, 1, 0.2)
-	-- love.graphics.rectangle('fill', x, y + (h - th / scale) / 2, tw / scale, th / scale)
+	love.graphics.setColor(1, 1, 1, 1)
 	
 	love.graphics.setFont(prevFont)
 end

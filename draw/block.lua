@@ -1,9 +1,10 @@
 local sizing = 0.9
 return function (e)
+	local scene = getEntityScene(e)
 	love.graphics.setColor(properties.color.level_end)
-	local x, y, w, h = getScene().bump:getRect(e)
+	local x, y, w, h = scene.bump:getRect(e)
 	-- love.graphics.rectangle('fill', x, y, w, h, 4, nil, 50)
-	local tw, th = getScene().level.tilewidth, getScene().level.tileheight
+	local tw, th = scene.level.tilewidth, scene.level.tileheight
 	local hc, vc = 2, 2
 	local mc = math.max(hc, vc)
 	for dy = 1, vc do

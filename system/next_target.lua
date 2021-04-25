@@ -4,7 +4,7 @@ return function()
 	targetSystem.filter = tiny.requireAll(isPhysical, hasInput, tiny.rejectAll('tween'))
 
 	function targetSystem:process(e, dt)
-		local scene = getScene()
+		local scene = getEntityScene(e)
 		
 		local tx, ty = rectToTile(scene.bump:getRect(e))
 		local mx, my = e.move.x, e.move.y
@@ -61,22 +61,43 @@ return function()
 		end
 		
 		if tx ~= nx or ty ~= ny then
-			local position = {tx, ty}
+			-- local position = {tx, ty}
+			local time = {value = 0, x = nx, y = ny}
+			if e.input and other and other.level then
+				e.finishLevel = time
+			end
 			local dist = math.max(math.abs(tx - nx), math.abs(ty - ny))
-			e.tween = scene.tween:to(position, 0.1 * math.sqrt(dist), {nx, ny})
+			e.tween = scene.tween:to(time, 0.2 * math.sqrt(dist), {value = 1})
 			:onupdate(function()
-				local x, y = tileToRect(position[1], position[2])
+				local t = time.value
+				local x, y = tileToRect(tx * (1 - t) + nx * t, ty * (1 - t) + ny * t)
 				scene.bump:move(e, x, y, function(e, o)
 					return 'cross'
 				end)
 			end)
 			:oncomplete(function()
+				log.trace('move finished')
+				e.move = vector(0)
 				if other and other.level then
+					-- manager:push(scene.newScene, other.level)
+					-- manager:pop(scene.newScene)
 					scene.newLevel = other.level
+					scene.newLevelTween = {value = 0}
+					scene.newLevelTween.reference = scene.tween:to(scene.newLevelTween, 0.7, {value = 1})
+					:delay(0.1)
+					:ease('quadinout')
+					:after(empty, 0.5, empty)
+					:oncomplete(function()
+						scene.newLevelTween = nil
+					end)
+					scene.newScene = newScene('scene.game')
+					scene.newScene.transitionTween = scene.newLevelTween
+					scene.newScene:enter(scene, other.level)
 				end
 				if not other then
 					scene.newLevel = "pop"
 				end
+				e.travelTime = nil
 				e.tween = nil
 				scene.tiny:addEntity(e)
 			end)

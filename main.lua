@@ -9,7 +9,8 @@ function love.load()
 	)
 	
 	manager:hook()
-	manager:enter(require 'scene.game')
+	-- manager:enter(require 'scene.game')
+	pushLevel(0)
 end
 
 function love.keypressed(key)

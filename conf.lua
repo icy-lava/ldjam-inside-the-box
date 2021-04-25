@@ -13,7 +13,7 @@ if cli.show_console or cli.debug then require 'alloc_console' () end
 
 log.trace 'patching in util.lua'
 require 'util'.export()
-levelStack = {0}
+levelStack = {}
 
 for k, c in pairs(properties.color) do
 	properties.color[k] = assert(codeToColor(c))

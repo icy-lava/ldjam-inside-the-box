@@ -7,9 +7,12 @@
 	"color": {
 		"player": "9A031E",
 		"level_end": "87A0B2",
-		"background": "321325"
+		"level_label": "9A031E",
+		"background": "321325",
+		"energy": "FFFFFF"
 	},
 	"font": {
+		"size": 36,
 		"main": "asset/font/nunito/Nunito-Regular.ttf"
 	},
 	"keyboard": {
@@ -23,7 +26,11 @@
 		"speed": 500
 	},
 	"epsilon": 0.001,
-	"tiles": ["player", "checkpoint", "stop", "block", "redirect_right", "redirect_up", "redirect_left", "redirect_down"],
+	"tiles": [
+		"player", "checkpoint", "stop", "block",
+		"redirect_right", "redirect_up", "redirect_left", "redirect_down",
+		"spike_right", "spike_up", "spike_left", "spike_down"
+	],
 	"direction_mapping": {
 		"right": [ 1,  0],
 		"up":    [ 0, -1],

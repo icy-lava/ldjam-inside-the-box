@@ -11,7 +11,7 @@ return function()
 			end
 		else
 			love.graphics.setColor(1, 1, 1, 1)
-			local x, y, w, h = getScene().bump:getRect(e)
+			local x, y, w, h = getEntityScene(e).bump:getRect(e)
 			love.graphics.rectangle('line', x, y, w, h)
 		end
 	end
