@@ -1,5 +1,6 @@
 manager = roomy.new()
 levelStack = {}
+collectedKeys = {}
 
 function love.load()
 	local ww, wh = love.window.getMode()

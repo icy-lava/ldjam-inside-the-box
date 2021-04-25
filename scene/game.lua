@@ -18,6 +18,7 @@ return function()
 			self.tiny:addSystem(require(s)())
 		end
 		
+		local player
 		for _, object in ipairs(lume.match(self.level.layers, function(l) return l.name == 'Objects' end).objects) do
 			if object.name:match('^level%d+$') then
 				local tile = {
@@ -28,26 +29,39 @@ return function()
 				assert(tile.level)
 				self.tiny:addEntity(tile)
 				self.bump:add(tile, snapRectToTile(object.x, object.y, object.width, object.height))
+			elseif object.name == 'player' then
+				assert(not player, 'only one player per level allowed')
+				player = {
+					input = true,
+					move = vector(),
+					speed = properties.player.speed,
+					draw = require 'draw.player',
+					z = 2
+				}
+				self.tiny:addEntity(player)
+				self.bump:add(player, snapRectToTile(object.x, object.y, object.width, object.height))
 			elseif object.name:match('^lock%$[^%$]+$') then
 				local tile = {
-					id = object.name:match('^lock%$([^%$]+)$'),
-					draw = require 'draw.lock'
+					lock = object.name:match('^lock%$([^%$]+)$'),
+					draw = require 'draw.lock',
+					z = 1
 				}
-				assert(tile.id)
+				assert(tile.lock)
 				self.tiny:addEntity(tile)
 				self.bump:add(tile, snapRectToTile(object.x, object.y, object.width, object.height))
 			elseif object.name:match('^key%$[^%$]+$') then
 				local tile = {
-					id = object.name:match('^key%$([^%$]+)$'),
+					key = object.name:match('^key%$([^%$]+)$'),
 					draw = require 'draw.key'
 				}
-				assert(tile.id)
-				self.tiny:addEntity(tile)
-				self.bump:add(tile, snapRectToTile(object.x, object.y, object.width, object.height))
+				assert(tile.key)
+				if not collectedKeys[tile.key] then
+					self.tiny:addEntity(tile)
+					self.bump:add(tile, snapRectToTile(object.x, object.y, object.width, object.height))
+				end
 			end
 		end
 		
-		local player
 		for i, id in ipairs(lume.match(self.level.layers, function(l) return l.name == 'Tiles' end).data) do
 			local type = properties.tiles[id] or 'undefined'
 			local x, y = (i - 1) % self.level.width, math.floor((i - 1) / self.level.width)
@@ -152,7 +166,38 @@ return function()
 		end
 	end
 
-	local function drawHUD(self)
+	local function drawHUD(self, w, h)
+		if collectedKeys.x and collectedKeys.y and collectedKeys.z then
+			local prevFont = love.graphics.getFont()
+			local scale = w / properties.window.virtual_width
+			local wantSize = (scale * 80 + 0.5)
+			local actualSize = 10
+			for _, size in ipairs(properties.font.HUDSizes) do
+				if size > wantSize then break end
+				actualSize = size
+			end
+			
+			local font = getFont(properties.font.main, actualSize)
+			local text = 'GO BACK'
+			local tw, th = font:getWidth(text), font:getHeight()
+			
+			local pad = actualSize / 2
+			local vOffset = math.floor(h - th - pad - actualSize / 2 + 0.5)
+			love.graphics.setColor(colorAlpha(properties.color.go_back_background, 0.5))
+			love.graphics.rectangle(
+				'fill',
+				math.floor((w - tw) / 2 - pad + 0.5), vOffset - pad,
+				math.floor(tw + pad * 2 + 0.5), math.floor(th + pad * 2 + 0.5),
+				actualSize / 4, nil, 50
+			)
+			
+			love.graphics.setColor(properties.color.go_back_text)
+			love.graphics.setFont(font)
+			love.graphics.print(text, math.floor((w - tw) / 2 + 0.5), vOffset)
+			
+			love.graphics.setFont(prevFont)
+		end
+		
 		if cli.debug then
 			love.graphics.setColor(1, 1, 1, 1)
 			love.graphics.print(string.format('%0.1fms, %d entities, %d systems', love.timer.getAverageDelta() * 1000, self.tiny:getEntityCount(), self.tiny:getSystemCount()), 4, 4)
@@ -227,11 +272,16 @@ return function()
 		self.camera:attach(sx, sy, sw, sh, true)
 		drawGame(self)
 		self.camera:detach()
-		love.graphics.setScissor(unpack(scissor, 1, 4))
 		if self.newScene and self.newLevel == 'pop' then
 			self.newScene:draw()
 		end
-		drawHUD(self, ww, wh)
+		if not self.from then
+			love.graphics.push()
+			love.graphics.translate(sx or 0, sy or 0)
+			drawHUD(self, sw or ww, sh or wh)
+			love.graphics.pop()
+		end
+		love.graphics.setScissor(unpack(scissor, 1, 4))
 	end
 
 	return game

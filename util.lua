@@ -202,6 +202,10 @@ function util.getCurrentLevel(scene)
 	return (scene or getScene()).level.id
 end
 
+function util.getLockLabel(id)
+	return ('$' .. id):upper()
+end
+
 function util.getLevelLabel(l)
 	return '#' .. (l or getCurrentLevel())
 end

@@ -3,16 +3,16 @@
  <tileset firstgid="1" source="level_design.tsx"/>
  <layer id="4" name="Tiles" width="7" height="7">
   <data encoding="csv">
-4,4,0,0,0,4,4,
-4,0,0,0,0,8,4,
+4,4,0,4,0,4,4,
+4,0,0,3,8,0,4,
 0,0,0,0,0,0,0,
-0,0,0,0,0,0,4,
-0,0,0,0,0,0,0,
-4,1,4,0,0,0,4,
-4,4,4,4,0,4,4
+0,3,0,6,0,3,0,
+0,0,0,0,3,0,0,
+4,1,0,0,0,0,4,
+4,4,4,0,4,4,4
 </data>
  </layer>
  <objectgroup id="5" name="Objects">
-  <object id="5" name="level4" x="192" y="192" width="64" height="64"/>
+  <object id="5" name="level5" x="192" y="256" width="64" height="64"/>
  </objectgroup>
 </map>

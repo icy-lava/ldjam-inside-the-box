@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.6.0" orientation="orthogonal" renderorder="right-down" width="5" height="5" tilewidth="64" tileheight="64" infinite="0" nextlayerid="6" nextobjectid="6">
+<map version="1.5" tiledversion="1.6.0" orientation="orthogonal" renderorder="right-down" width="5" height="5" tilewidth="64" tileheight="64" infinite="0" nextlayerid="6" nextobjectid="7">
  <tileset firstgid="1" source="level_design.tsx"/>
  <layer id="4" name="Tiles" width="5" height="5">
   <data encoding="csv">
 4,4,0,4,4,
-4,0,0,0,4,
+0,0,0,0,4,
 0,0,0,0,0,
 4,1,0,0,4,
 4,4,0,4,4
@@ -12,5 +12,6 @@
  </layer>
  <objectgroup id="5" name="Objects">
   <object id="5" name="level2" x="192" y="64" width="64" height="64"/>
+  <object id="6" name="lock$y" x="0" y="64" width="64" height="64"/>
  </objectgroup>
 </map>

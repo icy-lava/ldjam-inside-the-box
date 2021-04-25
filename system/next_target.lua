@@ -28,6 +28,9 @@ return function()
 		local other
 		local syst = lume.match(scene.tiny.systems, function(s) return s.physical end)
 		for _, o in ipairs(syst.entities) do
+			if o.key or (o.lock and collectedKeys[o.lock]) then
+				goto continue
+			end
 			local ox, oy = rectToTile(scene.bump:getRect(o))
 			if     mx > 0 then -- right
 				if ox > tx and oy == ty and (ox - tx < nx - tx) then
@@ -50,6 +53,7 @@ return function()
 					other = o
 				end
 			end
+			::continue::
 		end
 		
 		if e.redirect then
@@ -58,7 +62,7 @@ return function()
 		if other then
 			if other.redirector then
 				e.redirect = vector(unpack(properties.direction_mapping[other.direction], 1, 2))
-			elseif other.block or other.lock then
+			elseif other.block or (other.lock and not collectedKeys[other.lock]) then
 				nx, ny = nx - mx, ny - my
 			end
 		end
@@ -75,9 +79,18 @@ return function()
 			:onupdate(function()
 				local t = time.value
 				local x, y = tileToRect(tx * (1 - t) + nx * t, ty * (1 - t) + ny * t)
-				scene.bump:move(e, x, y, function(e, o)
+				local actualX, actualY, cols, len = scene.bump:move(e, x, y, function(e, o)
 					return 'cross'
 				end)
+				if e.input then
+					for i = 1, len do
+						local o = cols[i].other
+						if o.key then
+							collectedKeys[o.key] = true
+							scene.tiny:removeEntity(o)
+						end
+					end
+				end
 			end)
 			:oncomplete(function()
 				log.trace('move finished')

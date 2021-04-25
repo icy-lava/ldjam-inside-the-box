@@ -9,10 +9,13 @@
 		"level_end": "87A0B2",
 		"level_label": "9A031E",
 		"background": "321325",
-		"energy": "FFFFFF"
+		"energy": "FFFFFF",
+		"go_back_background": "000000",
+		"go_back_text": "FFFFFF"
 	},
 	"font": {
-		"size": 36,
+		"size": 32,
+		"HUDSizes": [12, 16, 24, 36, 48, 72, 96],
 		"main": "asset/font/nunito/Nunito-Regular.ttf"
 	},
 	"keyboard": {

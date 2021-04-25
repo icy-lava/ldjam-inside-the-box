@@ -17,6 +17,7 @@ globals = {
 	'manager',
 	'epsilon',
 	'levelStack',
+	'collectedKeys',
 }
 
 for k in pairs(require 'util') do
