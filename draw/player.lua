@@ -1,6 +1,9 @@
 return function (e)
 	local scene = getEntityScene(e)
 	local t = getLevelTween(scene)
+	if scene.zoomOut then
+		t = t * (1 - scene.zoomOut.value)
+	end
 	if t <= 0 then
 		t = getExitTween(scene)
 		love.graphics.setColor(lerpColorLab(t * t * t, properties.color.player, properties.color.energy))

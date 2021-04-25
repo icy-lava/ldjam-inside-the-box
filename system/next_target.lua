@@ -52,10 +52,13 @@ return function()
 			end
 		end
 		
+		if e.redirect then
+			e.redirect = nil
+		end
 		if other then
 			if other.redirector then
 				e.redirect = vector(unpack(properties.direction_mapping[other.direction], 1, 2))
-			elseif other.block then
+			elseif other.block or other.lock then
 				nx, ny = nx - mx, ny - my
 			end
 		end
@@ -66,6 +69,7 @@ return function()
 			if e.input and other and other.level then
 				e.finishLevel = time
 			end
+			e.lastDirection = vector(mx, my)
 			local dist = math.max(math.abs(tx - nx), math.abs(ty - ny))
 			e.tween = scene.tween:to(time, 0.2 * math.sqrt(dist), {value = 1})
 			:onupdate(function()
@@ -78,24 +82,21 @@ return function()
 			:oncomplete(function()
 				log.trace('move finished')
 				e.move = vector(0)
-				if other and other.level then
-					-- manager:push(scene.newScene, other.level)
-					-- manager:pop(scene.newScene)
-					scene.newLevel = other.level
+				if not other or (other and other.level) then
+					scene.newLevel = other and other.level or 'pop'
 					scene.newLevelTween = {value = 0}
 					scene.newLevelTween.reference = scene.tween:to(scene.newLevelTween, 0.7, {value = 1})
 					:delay(0.1)
 					:ease('quadinout')
-					:after(empty, 0.5, empty)
+					:after(empty, 0.2, empty)
 					:oncomplete(function()
 						scene.newLevelTween = nil
 					end)
+					
 					scene.newScene = newScene('scene.game')
 					scene.newScene.transitionTween = scene.newLevelTween
-					scene.newScene:enter(scene, other.level)
-				end
-				if not other then
-					scene.newLevel = "pop"
+					scene.newScene.from = scene
+					scene.newScene:enter(scene, other and other.level or levelStack[#levelStack - 1])
 				end
 				e.travelTime = nil
 				e.tween = nil

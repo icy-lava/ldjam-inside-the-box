@@ -1,7 +1,7 @@
 return function()
 	local game = {}
 
-	function game:enter(_, level)
+	function game:enter(_, level, popFrom)
 		log.trace('entered scene.game with level ', (''..level))
 		self.tween = flux.group()
 		self.level = json.decode(assert(love.filesystem.read(('asset/map_export/%d.json'):format(level))))
@@ -28,17 +28,17 @@ return function()
 				assert(tile.level)
 				self.tiny:addEntity(tile)
 				self.bump:add(tile, snapRectToTile(object.x, object.y, object.width, object.height))
-			elseif object.name:match('^lock%d+$') then
+			elseif object.name:match('^lock%$[^%$]+$') then
 				local tile = {
-					id = tonumber((object.name:match('^lock(%d+)$'))),
+					id = object.name:match('^lock%$([^%$]+)$'),
 					draw = require 'draw.lock'
 				}
 				assert(tile.id)
 				self.tiny:addEntity(tile)
 				self.bump:add(tile, snapRectToTile(object.x, object.y, object.width, object.height))
-			elseif object.name:match('^key%d+$') then
+			elseif object.name:match('^key%$[^%$]+$') then
 				local tile = {
-					id = tonumber((object.name:match('^key(%d+)$'))),
+					id = object.name:match('^key%$([^%$]+)$'),
 					draw = require 'draw.key'
 				}
 				assert(tile.id)
@@ -105,9 +105,26 @@ return function()
 		end
 		self.player = assert(player)
 		
+		self.tiny:refresh()
+		
+		if popFrom then
+			local e = lume.match(self.tiny.entities, function(e)
+				return e.level == popFrom[1]
+			end)
+			assert(e)
+			local x, y = rectToTile(self.bump:getRect(e))
+			self.zoomOut = {x = x, y = y, value = 0}
+			self.tween:to(self.zoomOut, 0.3, {value = 1})
+			:oncomplete(function()
+				self.zoomOut = nil
+			end)
+			:ease('quadinout')
+			self.bump:update(player, tileToRect(x, y))
+			player.redirect = popFrom[2]
+		end
+		
 		self.camera = require 'hump.camera' (0, 0)
 		updateCamera(self)
-		self.tiny:refresh()
 		
 		-- print(#self.tiny.entities)
 		
@@ -126,7 +143,7 @@ return function()
 		self.tiny:update(love.timer.getDelta(), function(_, s) return not s.draw end)
 		if self.newLevel and not self.newLevelTween then
 			if self.newLevel == 'pop' then
-				popLevel()
+				popLevel(getPlayer(self).lastDirection)
 			else
 				pushLevel(self.newLevel)
 			end
@@ -162,9 +179,11 @@ return function()
 		love.graphics.scale(1 / scale * math.min(self.level.width, self.level.height))
 		love.graphics.translate(-tw / 2, -th / 2)
 		
-		local l, a, b = vivid.RGBtoLab(properties.color.background)
-		local r, g, b = vivid.LabtoRGB(l + 3.5, a, b)
-		love.graphics.setColor(r, g, b, 1 - getExitTween(self))
+		local alpha = 1 - getExitTween(self)
+		if isPopScene(self) then
+			alpha = getLevelTween(self.from)
+		end
+		love.graphics.setColor(colorAlpha(properties.color.background_label, alpha))
 		love.graphics.print(text)
 		
 		love.graphics.pop()
@@ -178,16 +197,40 @@ return function()
 	function game:draw()
 		updateCamera(self)
 		local ww, wh = love.graphics.getDimensions()
-		if getLevelTween(self) <= 0 then
-			love.graphics.setColor(properties.color.background)
-			love.graphics.rectangle('fill', 0, 0, ww, wh)
+		local vw, vh = unpack(properties.window.virtual_size, 1, 2)
+		local aspectDiff = (vw / vh) / (ww / wh)
+		local sx, sy, sw, sh
+		if math.abs(aspectDiff - 1) > 0.001 then
+			if aspectDiff < 1 then
+				local scale = wh / vh
+				local bw, bh = vw * scale, vh * scale
+				sx, sy, sw, sh = math.floor((ww - bw) / 2 + 0.5), 0, bw, bh
+			else
+				local scale = ww / vw
+				local bw, bh = vw * scale, vh * scale
+				sx, sy, sw, sh = 0, math.floor((wh - bh) / 2 + 0.5), bw, bh
+			end
 		end
-		if self.newScene then
+		local scissor = {love.graphics.getScissor()}
+		love.graphics.setScissor(sx, sy, sw, sh)
+		-- if getLevelTween(self) <= 0 then
+			local alpha = 1
+			if self.from and self.from.newLevel == 'pop' then
+				alpha = getLevelTween(self.from)
+			end
+			love.graphics.setColor(colorAlpha(properties.color.background, alpha))
+			love.graphics.rectangle('fill', 0, 0, ww, wh)
+		-- end
+		if self.newScene and self.newLevel ~= 'pop' then
 			self.newScene:draw()
 		end
-		self.camera:attach()
+		self.camera:attach(sx, sy, sw, sh, true)
 		drawGame(self)
 		self.camera:detach()
+		love.graphics.setScissor(unpack(scissor, 1, 4))
+		if self.newScene and self.newLevel == 'pop' then
+			self.newScene:draw()
+		end
 		drawHUD(self, ww, wh)
 	end
 

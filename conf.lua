@@ -13,10 +13,14 @@ if cli.show_console or cli.debug then require 'alloc_console' () end
 
 log.trace 'patching in util.lua'
 require 'util'.export()
-levelStack = {}
 
 for k, c in pairs(properties.color) do
 	properties.color[k] = assert(codeToColor(c))
+end
+do
+	local l, a, b = vivid.RGBtoLab(properties.color.background)
+	local r, g, b = vivid.LabtoRGB(l + 3.5, a, b)
+	properties.color.background_label = {r, g, b, properties.color.background[4]}
 end
 
 log.debug('starting in ', cli.debug and 'debug mode' or 'release mode')

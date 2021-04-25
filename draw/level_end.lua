@@ -2,10 +2,18 @@ return function (e)
 	local scene = getEntityScene(e)
 	local t = getLevelTween(scene)
 	
+	if isPopScene(scene) then
+		t = 1 - getLevelTween(scene.from)
+	end
+	
 	local x, y, w, h = scene.bump:getRect(e)
 	local color = properties.color.level_end
 	love.graphics.setColor(color[1], color[2], color[3], 1 - t)
-	love.graphics.rectangle('fill', x, y, w, h, 4 * (1 - t), nil, 100)
+	love.graphics.push()
+	love.graphics.translate(x + w / 2, y + h / 2)
+	love.graphics.scale(0.9 + t * 0.1)
+	love.graphics.rectangle('fill', 0 - w / 2, 0 - h / 2, w, h, 4, nil, 50)
+	love.graphics.pop()
 	
 	local prevFont = love.graphics.getFont()
 	
@@ -33,7 +41,7 @@ return function (e)
 	love.graphics.translate(-tw / 2, -th / 2)
 	
 	local color2 = properties.color.level_label
-	love.graphics.setColor(color2[1], color2[2], color2[3], 1 - t * t * t)
+	love.graphics.setColor(colorAlpha(lerpColorLab(t, color2, properties.color.background_label), 1 - t))
 	love.graphics.print(text)
 	
 	love.graphics.pop()

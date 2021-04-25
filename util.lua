@@ -58,9 +58,10 @@ function util.pushLevel(l)
 	manager:enter(util.newScene('scene.game'), l)
 end
 
-function util.popLevel()
+function util.popLevel(directionOut)
+	local popFrom = levelStack[#levelStack]
 	levelStack[#levelStack] = nil
-	manager:enter(util.newScene('scene.game'), levelStack[#levelStack])
+	manager:enter(util.newScene('scene.game'), levelStack[#levelStack], {popFrom, directionOut})
 end
 
 function util.colorAlpha(color, alpha)
@@ -101,9 +102,24 @@ function util.getFont(path, size)
 end
 
 function util.getTransitionMultiplier(scene)
-	local div = 1
-	if scene.transitionTween then div = 2 - scene.transitionTween.value end
-	return 1 / div
+	-- if scene.newLevel == 'pop' then
+	-- 	return 2 - scene.transitionTween.value
+	-- else
+		local div = 1
+		if scene.transitionTween then
+			if isPopScene(scene) then
+				div = 1 + scene.transitionTween.value
+			else
+				div = 2 - scene.transitionTween.value
+			end
+		end
+		if scene.zoomOut then
+			local t = scene.zoomOut.value
+			local tiles = math.min(scene.level.width, scene.level.height)
+			div = 1 / tiles * 2 * (1 - t) + 1 * t
+		end
+		return 1 / div
+	-- end
 end
 
 function util.getLevelZoom(scene, w, h)
@@ -115,17 +131,50 @@ function util.getLevelZoom(scene, w, h)
 	return math.min(ww / scene.level.tilewidth / w, wh / scene.level.tileheight / h) * util.getTransitionMultiplier(scene)
 end
 
+function util.lookAtTile(scene, x, y)
+	scene.camera:lookAt(
+		scene.level.tilewidth  * x,
+		scene.level.tileheight * y
+	)
+end
+
+function util.isPopScene(scene)
+	return scene.from and scene.from.newLevel == 'pop' or false
+end
+
 function util.updateCamera(scene)
 	local t, x, y = util.getExitTween(scene)
 	local tw = getLevelTween(scene)
 	local fw, fh = scene.level.width  * (1 - t) + 2 * t, scene.level.height * (1 - t) + 2 * t
-	fw, fh = fw * (1 - tw) + 1 * tw, fh * (1 - tw) + 1 * tw
+	if scene.newLevel == 'pop' then
+		fw, fh = fw * (1 - tw) + fw * 2 * tw, fh * (1 - tw) + fh * 2 * tw
+	else
+		fw, fh = fw * (1 - tw) + 1 * tw, fh * (1 - tw) + 1 * tw
+	end
+	if isPopScene(scene) then
+		fw, fh = 1, 1
+	end
 	scene.camera:zoomTo(util.getLevelZoom(scene, fw, fh))
+	x, y = scene.level.width / 2 * (1 - t) + x * t, scene.level.height / 2 * (1 - t) + y * t
+	if isPopScene(scene) then
+		local e = lume.match(scene.tiny.entities, function(e)
+			return e.level == scene.from.level.id
+		end)
+		x, y = rectToTile(scene.bump:getRect(e))
+		x, y = x + 0.5, y + 0.5
+	end
+	if scene.zoomOut then
+		local t = scene.zoomOut.value
+		x, y = scene.zoomOut.x + 0.5, scene.zoomOut.y + 0.5
+		x = scene.level.width  / 2 * t + x * (1 - t)
+		y = scene.level.height / 2 * t + y * (1 - t)
+	end
 	
-	scene.camera:lookAt(
-		scene.level.tilewidth  * (scene.level.width  / 2 * (1 - t) + x * t),
-		scene.level.tileheight * (scene.level.height / 2 * (1 - t) + y * t)
-	)
+	util.lookAtTile(scene, x, y)
+	-- scene.camera:lookAt(
+	-- 	scene.level.tilewidth  * (scene.level.width  / 2 * (1 - t) + x * t),
+	-- 	scene.level.tileheight * (scene.level.height / 2 * (1 - t) + y * t)
+	-- )
 end
 
 function util.getPlayer(scene)
