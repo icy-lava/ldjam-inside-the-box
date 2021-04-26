@@ -11,11 +11,11 @@ return function (e)
 	-- love.graphics.circle('line', 0, 0, w / 2 / 4, 50)
 	-- love.graphics.line(w / 2 / 4, 0, w / 2 / 4 * 4, 0)
 	if not collectedKeys[e.lock] then
-		love.graphics.setColor(colorAlpha(properties.color.player, 0.3))
+		love.graphics.setColor(colorAlpha(properties.color.lock, 0.3))
 		love.graphics.rectangle('fill', -w / 9 * 4, -h / 9 * 4, w / 9 * 8, h / 9 * 8, 4, nil, 50)
 		love.graphics.push()
 		love.graphics.translate(0, -h / 16)
-		love.graphics.setColor(colorAlpha(properties.color.player, 1))
+		love.graphics.setColor(colorAlpha(properties.color.lock, 1))
 		love.graphics.rectangle('fill', -w / 4, 0, w / 2, w / 3, 2)
 		local r = w / 8
 		local points = {-r, 0}
@@ -31,7 +31,7 @@ return function (e)
 		love.graphics.pop()
 	else
 		love.graphics.setLineWidth(3)
-		love.graphics.setColor(colorAlpha(properties.color.player, 1))
+		love.graphics.setColor(colorAlpha(properties.color.lock, 1))
 		love.graphics.rectangle('line', -w / 9 * 4, -h / 9 * 4, w / 9 * 8, h / 9 * 8, 4, nil, 50)
 	end
 	

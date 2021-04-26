@@ -11,8 +11,11 @@ function love.load()
 	)
 	
 	manager:hook()
+	require 'sounds'
+	sound.music:play()
 	-- manager:enter(require 'scene.game')
-	pushLevel(0)
+	-- pushLevel(0)
+	manager:enter(newScene 'scene.menu')
 end
 
 function love.keypressed(key)

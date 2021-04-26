@@ -5,7 +5,7 @@ local directionMap = {
 	down = math.pi * 3 / 2,
 }
 return function (e)
-	love.graphics.setColor(properties.color.level_end)
+	love.graphics.setColor(properties.color.redirect)
 	local x, y, w, h = getEntityScene(e).bump:getRect(e)
 	local lineWidth = love.graphics.getLineWidth()
 	love.graphics.setLineWidth(8)

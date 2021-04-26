@@ -210,6 +210,11 @@ function util.getLevelLabel(l)
 	return '#' .. (l or getCurrentLevel())
 end
 
+function util.playSound(s)
+	sound[s]:stop()
+	sound[s]:play()
+end
+
 util.empty = {}
 
 function util.export()

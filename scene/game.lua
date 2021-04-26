@@ -128,7 +128,7 @@ return function()
 			assert(e)
 			local x, y = rectToTile(self.bump:getRect(e))
 			self.zoomOut = {x = x, y = y, value = 0}
-			self.tween:to(self.zoomOut, 0.3, {value = 1})
+			self.tween:to(self.zoomOut, 0.4, {value = 1})
 			:oncomplete(function()
 				self.zoomOut = nil
 			end)

@@ -1,6 +1,6 @@
 return function (e)
 	local scene = getEntityScene(e)
-	love.graphics.setColor(properties.color.player)
+	love.graphics.setColor(properties.color.key)
 	local x, y, w, h = scene.bump:getRect(e)
 	local lineWidth = love.graphics.getLineWidth()
 	love.graphics.setLineWidth(5)

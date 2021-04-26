@@ -5,10 +5,15 @@
 		"virtual_size": "720:720"
 	},
 	"color": {
-		"player": "9A031E",
-		"level_end": "87A0B2",
-		"level_label": "9A031E",
-		"background": "321325",
+		"player": "ddab32",
+		"lock": "9A031E",
+		"key": "9A031E",
+		"redirect": "9A031E",
+		"stop": "0C7C59",
+		"block": "8D80AD",
+		"level_end": "58A4B0",
+		"level_label": "0C7C59",
+		"background": "450d3d",
 		"energy": "FFFFFF",
 		"go_back_background": "000000",
 		"go_back_text": "FFFFFF"
@@ -39,5 +44,28 @@
 		"up":    [ 0, -1],
 		"left":  [-1,  0],
 		"down":  [ 0,  1]
+	},
+	"sound": {
+		"hit": {
+			"volume": 0.5
+		},
+		"whoosh": {
+			"volume": 0.5
+		},
+		"swoosh": {
+			"volume": 0.2
+		},
+		"stick": {
+			"volume": 0.2
+		},
+		"redirect": {
+			"volume": 0.3
+		},
+		"transition": {
+			"volume": 0.1
+		},
+		"key": {
+			"volume": 0.3
+		}
 	}
 }

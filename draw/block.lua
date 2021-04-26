@@ -1,7 +1,7 @@
 local sizing = 0.9
 return function (e)
 	local scene = getEntityScene(e)
-	love.graphics.setColor(colorAlpha(properties.color.level_end, 0.2))
+	love.graphics.setColor(colorAlpha(properties.color.block, 0.5))
 	local x, y, w, h = scene.bump:getRect(e)
 	-- love.graphics.rectangle('fill', x, y, w, h, 4, nil, 50)
 	local tw, th = scene.level.tilewidth, scene.level.tileheight

@@ -59,11 +59,17 @@ return function()
 		if e.redirect then
 			e.redirect = nil
 		end
+		local sound = other and 'hit' or nil
 		if other then
 			if other.redirector then
+				sound = 'redirect'
 				e.redirect = vector(unpack(properties.direction_mapping[other.direction], 1, 2))
 			elseif other.block or (other.lock and not collectedKeys[other.lock]) then
 				nx, ny = nx - mx, ny - my
+			elseif other.level then
+				sound = nil
+			elseif other.stop then
+				sound = 'stick'
 			end
 		end
 		
@@ -72,10 +78,12 @@ return function()
 			local time = {value = 0, x = nx, y = ny}
 			if e.input and other and other.level then
 				e.finishLevel = time
+				playSound 'swoosh'
+				playSound 'transition'
 			end
 			e.lastDirection = vector(mx, my)
 			local dist = math.max(math.abs(tx - nx), math.abs(ty - ny))
-			e.tween = scene.tween:to(time, 0.2 * math.sqrt(dist), {value = 1})
+			e.tween = scene.tween:to(time, 0.25 * math.sqrt(dist), {value = 1})
 			:onupdate(function()
 				local t = time.value
 				local x, y = tileToRect(tx * (1 - t) + nx * t, ty * (1 - t) + ny * t)
@@ -85,7 +93,8 @@ return function()
 				if e.input then
 					for i = 1, len do
 						local o = cols[i].other
-						if o.key then
+						if o.key and not collectedKeys[o.key] then
+							playSound 'key'
 							collectedKeys[o.key] = true
 							scene.tiny:removeEntity(o)
 						end
@@ -94,12 +103,14 @@ return function()
 			end)
 			:oncomplete(function()
 				log.trace('move finished')
+				if sound then playSound(sound) end
 				e.move = vector(0)
 				if not other or (other and other.level) then
 					scene.newLevel = other and other.level or 'pop'
 					scene.newLevelTween = {value = 0}
-					scene.newLevelTween.reference = scene.tween:to(scene.newLevelTween, 0.7, {value = 1})
-					:delay(0.1)
+					playSound 'whoosh'
+					scene.newLevelTween.reference = scene.tween:to(scene.newLevelTween, 0.6, {value = 1})
+					:delay(0.05)
 					:ease('quadinout')
 					:after(empty, 0.2, empty)
 					:oncomplete(function()

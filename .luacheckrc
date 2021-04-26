@@ -18,6 +18,7 @@ globals = {
 	'epsilon',
 	'levelStack',
 	'collectedKeys',
+	'sound',
 }
 
 for k in pairs(require 'util') do

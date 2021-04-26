@@ -1,6 +1,6 @@
 return function (e)
 	local scene = getEntityScene(e)
-	love.graphics.setColor(properties.color.level_end)
+	love.graphics.setColor(properties.color.stop)
 	local x, y, w, h = scene.bump:getRect(e)
 	-- love.graphics.rectangle('fill', x, y, w, h, 4, nil, 50)
 	local hc, vc = 3, 3
